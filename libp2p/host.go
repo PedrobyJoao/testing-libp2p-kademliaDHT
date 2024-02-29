@@ -15,8 +15,12 @@ import (
 	"github.com/multiformats/go-multiaddr"
 )
 
-var h host.Host
-var idht *dht.IpfsDHT
+var (
+	h    host.Host
+	idht *dht.IpfsDHT
+
+	kadPrefix = dht.ProtocolPrefix("/test")
+)
 
 // NewHost creates a new libp2p host
 func NewHost(port int, bootstrapPeers ...string) (host.Host, error) {
@@ -31,6 +35,11 @@ func NewHost(port int, bootstrapPeers ...string) (host.Host, error) {
 		return nil, fmt.Errorf("failed to generate private key: %v", err)
 	}
 
+	baseOpts := []dht.Option{
+		kadPrefix,
+		dht.Mode(dht.ModeServer),
+	}
+
 	h, err = libp2p.New(
 		libp2p.ListenAddrStrings(
 			fmt.Sprintf("/ip4/127.0.0.1/tcp/%d", port),
@@ -38,7 +47,7 @@ func NewHost(port int, bootstrapPeers ...string) (host.Host, error) {
 		),
 		libp2p.Identity(prvKey),
 		libp2p.Routing(func(h host.Host) (routing.PeerRouting, error) {
-			idht, err = dht.New(ctx, h)
+			idht, err = dht.New(ctx, h, baseOpts...)
 			return idht, err
 		}),
 	)
@@ -53,6 +62,11 @@ func NewHost(port int, bootstrapPeers ...string) (host.Host, error) {
 		}
 	}
 
+	err = idht.Bootstrap(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to bootstrap dht: %v", err)
+	}
+
 	// prints host PeerID and listen addresses
 	fmt.Printf("PeerID: %s\n", h.ID())
 	fmt.Printf("Listen addresses: %s\n", h.Addrs())
@@ -61,7 +75,6 @@ func NewHost(port int, bootstrapPeers ...string) (host.Host, error) {
 }
 
 func connectToBootstrapNodes(ctx context.Context, h host.Host, bootstrapPeers []string) error {
-	// TODO: dht bootstrap?
 	for _, bp := range bootstrapPeers {
 		addr, err := multiaddr.NewMultiaddr(bp)
 		if err != nil {
