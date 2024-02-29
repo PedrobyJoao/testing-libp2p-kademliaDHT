@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/PedrobyJoao/libp2p-test-network/libp2p"
+	"github.com/PedrobyJoao/libp2p-test-network/utils"
 )
 
 func advertiseKeyValueDHT(w http.ResponseWriter, r *http.Request) {
@@ -50,6 +51,10 @@ func getProvidersDHT(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(peers)
 }
 
+func getPeersFromPeerStore(w http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(w).Encode(libp2p.GetPeersFromPeerStore())
+}
+
 func handleErrorResponse(w http.ResponseWriter, err error) {
 	log.Printf("%v", err)
 	w.Header().Set("Content-Type", "application/json")
@@ -57,20 +62,17 @@ func handleErrorResponse(w http.ResponseWriter, err error) {
 	json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 }
 
-func main() {
+func Serve() {
 	router := mux.NewRouter()
+	router.HandleFunc("/peer_store/peers", getPeersFromPeerStore).Methods("GET")
 	router.HandleFunc("/dht/get_providers/{key}", getProvidersDHT).Methods("GET")
 	router.HandleFunc("/dht/advertise", advertiseKeyValueDHT).Methods("POST")
 
-	log.Fatal(http.ListenAndServe(":8000", router))
-}
+	port, err := utils.FindFreePort()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("API Listening on port %d", port)
 
-// GetItem handles GET requests for a specific item
-// func GetItem(w http.ResponseWriter, r *http.Request) {
-// 	params := mux.Vars(r)
-// 	for _, item := range items {
-// 		if item.ID == params["id"] {
-// 			// json.NewEncoder(w).Encode(item) [item must be a ]
-// 			return
-// 		}
-// 	}
+	log.Fatal(http.ListenAndServe(":"+fmt.Sprint(port), router))
+}

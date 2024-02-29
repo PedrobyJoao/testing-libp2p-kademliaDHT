@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/PedrobyJoao/libp2p-test-network/api"
 	"github.com/PedrobyJoao/libp2p-test-network/libp2p"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -25,7 +26,7 @@ func main() {
 	if *bootstrap {
 		log.Println("Selected to connect to bootstrap nodes...")
 		bootstrapPeers = []string{
-			"/ip4/127.0.0.1/tcp/8080/p2p/QmdWGyw79h4KVK6eiwzvqgaTYV1mZTco9epPHhfeJwPBwz",
+			"/ip4/127.0.0.1/tcp/8080/p2p/QmZQM1jF7pjazfe3H6C9jnpnVeMCZ47zGCmUBLteR9izdi",
 		}
 	}
 
@@ -38,6 +39,8 @@ func main() {
 	// serveMetricsToPrometheus()
 
 	fmt.Println(host.Peerstore().Peers())
+
+	go api.Serve()
 
 	// wait for a SIGINT or SIGTERM signal
 	ch := make(chan os.Signal, 1)
