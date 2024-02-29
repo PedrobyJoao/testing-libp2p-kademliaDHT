@@ -26,6 +26,7 @@ func main() {
 	if *bootstrap {
 		log.Println("Selected to connect to bootstrap nodes...")
 		bootstrapPeers = []string{
+			// Change it for your own bootstrap node
 			"/ip4/127.0.0.1/tcp/8080/p2p/QmZQM1jF7pjazfe3H6C9jnpnVeMCZ47zGCmUBLteR9izdi",
 		}
 	}
