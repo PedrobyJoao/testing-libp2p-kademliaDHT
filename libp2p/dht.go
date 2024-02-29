@@ -7,7 +7,22 @@ import (
 
 	"github.com/ipfs/go-cid"
 	"github.com/libp2p/go-libp2p/core/peer"
+	mh "github.com/multiformats/go-multihash"
 )
+
+func main() {
+	// Your random string
+	randomString := "your-random-string"
+
+	// Create a multihash from the random string
+	hash, _ := mh.Sum([]byte(randomString), mh.SHA2_256, -1)
+
+	// Create a CID using the multihash
+	c := cid.NewCidV1(cid.Raw, hash)
+
+	// Print out the CID
+	fmt.Println(c)
+}
 
 func AdvertiseKeyValue(ctx context.Context, key string) error {
 	log.Printf("Advertising key: %s. Parsing it to CID first...", key)
@@ -55,10 +70,14 @@ func parseStringIntoCID(s string) (cid.Cid, error) {
 		return cid.Cid{}, nil
 	}
 
-	_, cidForm, err := cid.CidFromBytes([]byte(s))
+	// Create a multihash from the random string
+	hash, err := mh.Sum([]byte(s), mh.SHA2_256, -1)
 	if err != nil {
-		return cid.Cid{}, fmt.Errorf("couldn't convert bytes to CID: %w", err)
+		return cid.Cid{}, fmt.Errorf("couldn't create multihash from string: %w", err)
 	}
 
-	return cidForm, nil
+	// Create a CID using the multihash
+	c := cid.NewCidV1(cid.Raw, hash)
+
+	return c, nil
 }
