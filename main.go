@@ -9,8 +9,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/PedrobyJoao/libp2p-test-network/api"
-	"github.com/PedrobyJoao/libp2p-test-network/libp2p"
+	"github.com/PedrobyJoao/testing-libp2p-kademliaDHT/api"
+	"github.com/PedrobyJoao/testing-libp2p-kademliaDHT/libp2p"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 

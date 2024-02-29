@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/PedrobyJoao/libp2p-test-network/libp2p"
-	"github.com/PedrobyJoao/libp2p-test-network/utils"
+	"github.com/PedrobyJoao/testing-libp2p-kademliaDHT/libp2p"
+	"github.com/PedrobyJoao/testing-libp2p-kademliaDHT/utils"
 )
 
 func advertiseKeyValueDHT(w http.ResponseWriter, r *http.Request) {
