@@ -10,20 +10,6 @@ import (
 	mh "github.com/multiformats/go-multihash"
 )
 
-func main() {
-	// Your random string
-	randomString := "your-random-string"
-
-	// Create a multihash from the random string
-	hash, _ := mh.Sum([]byte(randomString), mh.SHA2_256, -1)
-
-	// Create a CID using the multihash
-	c := cid.NewCidV1(cid.Raw, hash)
-
-	// Print out the CID
-	fmt.Println(c)
-}
-
 func AdvertiseKeyValue(ctx context.Context, key string) error {
 	log.Printf("Advertising key: %s. Parsing it to CID first...", key)
 	keyCID, err := parseStringIntoCID(key)
