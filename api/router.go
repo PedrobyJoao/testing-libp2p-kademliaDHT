@@ -36,9 +36,16 @@ func advertiseKeyValueDHT(w http.ResponseWriter, r *http.Request) {
 }
 
 func getProvidersDHT(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	key := params["key"]
+	key := r.URL.Query().Get("key")
+	if key == "" {
+		handleErrorResponse(
+			w,
+			fmt.Errorf("Key query parameter is missing"),
+		)
+		return
+	}
 
+	log.Printf("Key: %s", key)
 	peers, err := libp2p.GetProvidersForKey(r.Context(), key)
 	if err != nil {
 		handleErrorResponse(
@@ -65,7 +72,7 @@ func handleErrorResponse(w http.ResponseWriter, err error) {
 func Serve() {
 	router := mux.NewRouter()
 	router.HandleFunc("/peer_store/peers", getPeersFromPeerStore).Methods("GET")
-	router.HandleFunc("/dht/get_providers/{key}", getProvidersDHT).Methods("GET")
+	router.HandleFunc("/dht/get_providers", getProvidersDHT).Methods("GET")
 	router.HandleFunc("/dht/advertise", advertiseKeyValueDHT).Methods("POST")
 
 	port, err := utils.FindFreePort()
